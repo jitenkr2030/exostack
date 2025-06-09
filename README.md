@@ -1,8 +1,4 @@
-Here's a professional and well-structured `README.md` for your [ExoStack](https://github.com/jitenkr2030/exostack.git) project:
 
----
-
-```markdown
 # 🚀 ExoStack
 
 **ExoStack** is an open-source hybrid AI orchestration platform designed to connect, register, and distribute ML/LLM workloads across a decentralized cluster of edge, cloud, and local GPU devices. Inspired by [Exo](https://github.com/exo-explore/exo) and [dstack](https://github.com/dstackai/dstack), ExoStack combines the best of peer-based compute and centralized control.
