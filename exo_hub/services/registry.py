@@ -1,1 +1,1 @@
-# registry.py
+# Placeholder for device registration and management
