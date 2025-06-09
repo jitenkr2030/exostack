@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+typer
+aiohttp
+httpx
+pydantic
+transformers
+torch
+redis
