@@ -1,0 +1,48 @@
+# ExoStack Agent Dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies including PyTorch dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    netcat-openbsd \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install PyTorch (CPU version for general compatibility)
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Copy application code
+COPY exo_agent/ ./exo_agent/
+COPY shared/ ./shared/
+COPY pyproject.toml .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/models /app/data
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV TRANSFORMERS_CACHE=/app/models
+ENV HF_HOME=/app/models
+
+# Set default agent configuration
+ENV AGENT_HOST=0.0.0.0
+ENV AGENT_PORT=8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD python -c "import requests; requests.get('$HUB_URL/status')" || exit 1
+
+# Run the agent
+CMD ["python", "-m", "exo_agent.agent"]

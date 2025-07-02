@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exostack-config
+  namespace: exostack
+data:
+  # Hub Configuration
+  HUB_HOST: "0.0.0.0"
+  HUB_PORT: "8000"
+  HUB_URL: "http://exostack-hub-service:8000"
+  
+  # Redis Configuration
+  REDIS_URL: "redis://redis-service:6379/0"
+  
+  # Model Configuration
+  DEFAULT_MODEL: "microsoft/DialoGPT-medium"
+  MODEL_CACHE_DIR: "/app/models"
+  MAX_MODEL_MEMORY: "4096"
+  
+  # Logging Configuration
+  LOG_LEVEL: "INFO"
+  LOG_FILE: "/app/logs/exostack.log"
+  
+  # Resource Management
+  MAX_CONCURRENT_TASKS: "5"
+  TASK_TIMEOUT_SECONDS: "300"
+  HEARTBEAT_INTERVAL: "10"
+  
+  # Development Configuration
+  DEBUG: "false"
+  DEVELOPMENT_MODE: "false"

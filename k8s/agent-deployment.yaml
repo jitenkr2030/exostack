@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exostack-agent
+  namespace: exostack
+  labels:
+    app: exostack-agent
+    component: agent
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: exostack-agent
+  template:
+    metadata:
+      labels:
+        app: exostack-agent
+    spec:
+      containers:
+      - name: exostack-agent
+        image: exostack/agent:latest
+        envFrom:
+        - configMapRef:
+            name: exostack-config
+        env:
+        - name: AGENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: models
+          mountPath: /app/models
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 0  # Optional: for GPU support
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+            nvidia.com/gpu: 1  # Optional: for GPU support
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import requests; requests.get('http://exostack-hub-service:8000/status')"
+          initialDelaySeconds: 60
+          periodSeconds: 30
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-pvc
+      initContainers:
+      - name: wait-for-hub
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z exostack-hub-service 8000; do echo waiting for hub; sleep 5; done;']
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: exostack-agent-hpa
+  namespace: exostack
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: exostack-agent
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

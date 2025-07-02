@@ -1,4 +1,11 @@
-import os
-
-AGENT_ID = os.getenv("AGENT_ID", "agent-001")
-HUB_URL = os.getenv("HUB_URL", "http://localhost:8000")
+# Import shared configuration
+from shared.config.env import (
+    AGENT_ID,
+    HUB_URL,
+    AGENT_HOST,
+    AGENT_PORT,
+    LOG_LEVEL,
+    HEARTBEAT_INTERVAL,
+    MAX_CONCURRENT_TASKS,
+    TASK_TIMEOUT_SECONDS
+)

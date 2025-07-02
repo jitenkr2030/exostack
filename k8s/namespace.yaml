@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: exostack
+  labels:
+    name: exostack
+    app: exostack-distributed-ai
